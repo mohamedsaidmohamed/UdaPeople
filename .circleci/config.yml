@@ -44,7 +44,7 @@ jobs:
           keys:
             frontend-build
       
-       - run:
+      - run:
           name: front-end test
           command: |
             cd frontend
