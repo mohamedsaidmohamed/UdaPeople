@@ -1,5 +1,7 @@
 version: 2.1
-
+orbs: 
+  slack: circleci/slack@4.10.1
+  
 jobs:
   build-frontend:
     docker:
@@ -100,9 +102,12 @@ jobs:
               npm install
               npm install --save-dev webpack@5.73.0
               npm audit fix --audit-level=critical --force
-              npm update mkdirp --depth
+              # npm update mkdirp --depth
               npm audit --audit-level=critical
-
+        - slack/notify:
+            channel: practises
+            event: fail
+            template: basic_fail_1
 workflows:
   default:
     jobs:
