@@ -100,7 +100,7 @@ jobs:
               npm install
               npm audit fix --audit-level=critical --force
               npm audit --audit-level=critical
-             
+              npm install --save-dev webpack@5.73.0
               
 
 
