@@ -19,13 +19,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - slack/notify:
-            channel: practises
-            event: fail
-            template: basic_fail_1
-      - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
+      
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -43,14 +37,6 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
-      - slack/notify:
-            channel: practises
-            event: fail
-            template: basic_fail_1
-      - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
-
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -66,14 +52,7 @@ jobs:
             cd frontend
             npm install
             npm run test
-      - slack/notify:
-            channel: practises
-            event: fail
-            template: basic_fail_1
-      - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
-
+      
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -89,14 +68,8 @@ jobs:
             cd backend
             npm install
             npm run test
-      - slack/notify:
-            channel: practises
-            event: fail
-            template: basic_fail_1
-      - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
-
+      
+      
   scan-frontend:
       docker:
         - image: circleci/node:13.8.0
@@ -112,14 +85,8 @@ jobs:
               npm install
               npm audit fix --audit-level=critical --force
               npm audit --audit-level=critical
-        - slack/notify:
-            channel: practises
-            event: fail
-            template: basic_fail_1
-        - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
 
+        
   scan-backend:
       docker:
         - image: circleci/node:13.8.0
@@ -141,25 +108,19 @@ jobs:
             channel: practises
             event: fail
             template: basic_fail_1
-        - slack/notify:
-            event: pass
-            template: success_tagged_deploy_1
+        
 workflows:
   default:
     jobs:
-      - build-frontend:
-          context: Slack
-      - build-backend:
-          context: Slack
+      - build-frontend  
+      - build-backend
       - test-frontend:
           requires: [build-frontend]
-          context: Slack
       - test-backend:
           requires: [build-backend]
-          context: Slack
       - scan-backend:
           requires: [build-backend]
           context: Slack
       - scan-frontend:
           requires: [build-frontend]
-          context: Slack
+         
