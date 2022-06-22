@@ -178,7 +178,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --no-cache aws-cli
+            # apk add --no-cache aws-cli
             yum -y install tar gzip
             apk add --update ansible 
           #exit 1
