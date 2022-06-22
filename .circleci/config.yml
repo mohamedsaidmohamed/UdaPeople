@@ -190,6 +190,30 @@ jobs:
             
           #exit 1
       # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            # Run and save the migration output
+            npm run migrations > migrations_dump.txt
+           # exit 1
+      - run:
+          name: Send migration results to Kvdb
+          command: |
+              if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+              then
+                curl https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              fi
+            #exit 1
+     # Here's where you will add some code to rollback on failure      
 
 workflows:
   default:
@@ -210,3 +234,5 @@ workflows:
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
