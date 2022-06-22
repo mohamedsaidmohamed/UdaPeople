@@ -1,9 +1,8 @@
 ---
   - name: "update apt packages."
     become: yes
-    xxxxxx: xxxxx
     apt:
-      update_cachexx: yes
+      update_cache: yes
 
   - name: "upgrade packages"
     become: yes
