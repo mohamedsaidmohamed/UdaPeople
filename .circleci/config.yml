@@ -17,6 +17,7 @@ commands:
 
           #exit 1
 
+
 jobs:
   build-frontend:
     docker:
@@ -164,6 +165,31 @@ jobs:
       # Here's where you will add some code to rollback on failure      
       - destroy-environment:
           workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["e1:17:23:00:49:1e:16:38:4b:02:4b:7e:ec:2e:71:97"]
+       - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache aws-cli
+            yum -y install tar gzip
+            apk add --update ansible 
+          #exit 1
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+            
+          #exit 1
+      # Here's where you will add some code to rollback on failure      
 
 workflows:
   default:
