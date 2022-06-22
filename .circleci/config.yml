@@ -173,7 +173,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["e1:17:23:00:49:1e:16:38:4b:02:4b:7e:ec:2e:71:97"]
-       - attach_workspace:
+      - attach_workspace:
           at: ~/
       - run:
           name: Install dependencies
@@ -207,3 +207,5 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
