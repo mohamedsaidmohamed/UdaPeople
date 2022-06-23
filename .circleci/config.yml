@@ -12,10 +12,30 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-           aws cloudformation delete-stack --stack-name udapeople-backend-${workflowID}
-           aws cloudformation delete-stack --stack-name udapeople-frontend-${workflowID}
+           aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflowID >>
+           aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflowID >>
 
           #exit 1
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      workflowID: 
+        type: string   
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS = $(curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_<< parameters.workflowID >>)
+            if(( $SUCCESS==1 )); 
+            then
+                cd ~/project/backend
+                npm install
+                npn run migration:revert
+            fi
+
 
   install_awscli:
     description: Install AWS CLI 
@@ -241,10 +261,13 @@ jobs:
           command: |
               if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
               then
-                curl http://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
-            #exit 1
-     # Here's where you will add some code to rollback on failure      
+      - destroy-environment:
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+
   deploy-frontend:
     docker:
       - image: cimg/base:stable
