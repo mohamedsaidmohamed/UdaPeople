@@ -14,12 +14,16 @@
   apt:
     autoremove: yes
 
-- name: "install dependencies."
+- name: "install npm"
   become: yes
   apt:
-    name: ["nodejs", "npm"]
+    name: ["npm"]
     state: latest
     update_cache: yes
+
+- name: "install nodeJs 13.8.0"
+  become: yes
+  shell: n 13.8.0
 
 - name: "install pm2"
   become: yes
