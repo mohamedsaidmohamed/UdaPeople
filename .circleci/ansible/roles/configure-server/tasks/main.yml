@@ -21,8 +21,17 @@
     state: latest
     update_cache: yes
 
-- name: "install nodeJs 13.8.0"
-  shell: curl -sL https://deb.nodesource.com/setup_13.x |  sudo -E bash - && sudo apt-get install -y nodejs
+- name: "Add nodeJs 10.x"
+  become: true
+  shell: curl -sL https://deb.nodesource.com/setup_10.x |  sudo -E bash - 
+
+
+- name: "install nodeJs 10.x"
+  become: true
+  apt:
+    name: [nodejs]
+    state: latest
+    update_cache: yes
 
 - name: "install pm2"
   become: yes
