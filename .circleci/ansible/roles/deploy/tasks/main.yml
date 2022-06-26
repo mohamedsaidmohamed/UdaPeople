@@ -1,0 +1,28 @@
+---
+- name: "Create backend app dir"
+  file:
+    path: ~/backend-app
+    state: directory
+
+- name: "Unarachive backend files"
+  unarchive:
+    src: artifact.tar.gz 
+    dest: ~/backend-app
+
+- name: "Install Node Deps"
+  shell: |
+    cd ~/backend-app
+    npm i
+
+- name: "Executing app with pm2"
+  shell: |
+    cd ~/backend-app/dist
+    pm2 stop default
+    pm2 start main.js
+    
+
+
+   
+
+
+
