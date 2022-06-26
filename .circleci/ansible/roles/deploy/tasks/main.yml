@@ -13,9 +13,6 @@
   shell: |
     cd ~/backend-app
     npm i
-    
-- name: "install nodeJs 13.8.0"
-  shell: curl -sL https://deb.nodesource.com/setup_13.x |  sudo -E bash - && sudo apt-get install -y nodejs
 
 - name: "Executing app with pm2"
   shell: |
