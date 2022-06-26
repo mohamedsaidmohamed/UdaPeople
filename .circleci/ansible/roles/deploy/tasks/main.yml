@@ -19,8 +19,17 @@
     cd ~/backend-app/dist
     pm2 stop default
     pm2 start main.js
-    
 
+  register: execute_node
+
+- name: print message
+  debug:
+    msg "{{ execute_node.stdout_lines }}"
+
+- name: "configure  pm2 to start as a service"
+  become : true
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --h /home/ubuntu
 
    
 
