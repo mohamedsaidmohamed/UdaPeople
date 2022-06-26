@@ -219,20 +219,15 @@ jobs:
   
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
       - add_ssh_keys:
           fingerprints: ["e1:17:23:00:49:1e:16:38:4b:02:4b:7e:ec:2e:71:97"]
       - attach_workspace:
           at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            # apk add --no-cache aws-cli
-            # yum -y install tar gzip
-            apk add --update ansible 
-          #exit 1
       - run:
           name: Configure server
           command: |
@@ -363,11 +358,11 @@ workflows:
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
 
    
