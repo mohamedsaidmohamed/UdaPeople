@@ -323,7 +323,7 @@ jobs:
           command: |
             cd backend
             npm install
-      -run:
+      - run:
         name: Ansible to copy the files.
         command: |
             cd backend
