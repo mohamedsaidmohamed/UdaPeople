@@ -348,7 +348,9 @@ jobs:
           name: Install dependencies
           command: |
             sudo apt update
+            sudo apt upgrade
             sudo apt install curl
+            curl http://www.google.com
       - run:
           name: Backend smoke test.
           command: |
@@ -357,7 +359,7 @@ jobs:
               --output text )
             
               export API_URL="http://${BACKEND_IP}:3030"
-              if curl -s ${API_URL}/api/status | grep "ok"
+              if curl -s $API_URL/api/status | grep "ok"
               then 
                 exist 0
               else 
