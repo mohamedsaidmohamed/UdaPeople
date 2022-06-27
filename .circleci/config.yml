@@ -342,7 +342,7 @@ jobs:
       - image: alpine:latest
     steps:
       - checkout
-      # - install_awscli
+      - install_awscli
       # - install_nodejs
       - run: apk add --update curl
       # - run:
