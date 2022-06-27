@@ -26,14 +26,14 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            # SUCCESS=$(curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_<< parameters.workflowID >>)
-            # if(( $SUCCESS == 1 )); 
-            # then
+            Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS=$(curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_<< parameters.workflowID >>)
+            if(( $SUCCESS == 1 )); 
+            then
               cd ~/project/backend
               npm install
               npm run migrations:revert
-            #fi
+            fi
 
   install_awscli:
     description: Install AWS CLI 
@@ -366,7 +366,7 @@ jobs:
             FRONTEND_WWEB="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com"
             if curl -s $FRONTEND_WWEB | grep "Welcome"
             then 
-                exit 1
+                exit 0
             else 
                 exit 1
             fi
@@ -375,7 +375,36 @@ jobs:
       - revert-migrations:
           workflowID: ${CIRCLE_WORKFLOW_ID:0:7} 
 
-  
+  cloudfront-update:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs
+      - run:
+          name: save old workflow id to kvdb.io
+          command: |
+            export OLD_WORKFLOWID=$(aws cloudformation \
+                      list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                      --no-paginate --output text)
+            echo "OLD WORKFLOW ID: $OLD_WORKFLOWID" 
+            curl https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/old_workflow_id -d "${OLD_WORKFLOWID}"
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+                --template-file .circleci/files/cloudfront.yml \
+                --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \  
+                --stack-name InitialStack 
+      
+      - destroy-environment:
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      
+
+
 workflows:
   default:
     jobs:
@@ -403,3 +432,5 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
