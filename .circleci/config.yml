@@ -339,18 +339,19 @@ jobs:
 
   smoke-test:
     docker:
-      - image: cimg/base:stable
+      - image: alpine:latest
     steps:
       - checkout
-      - install_awscli
-      - install_nodejs
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt update
-            sudo apt upgrade
-            sudo apt install curl
-            sudo apt install grep
+      # - install_awscli
+      # - install_nodejs
+      - run: apk add --update curl
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       sudo apt update
+      #       sudo apt upgrade
+      #       sudo apt install curl
+      #       sudo apt install grep
       - run:
           name: Install smoke
           command: |
