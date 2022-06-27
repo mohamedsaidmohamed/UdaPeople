@@ -339,20 +339,18 @@ jobs:
 
   smoke-test:
     docker:
-      - image: alpine:latest
+      - image: cimg/base:stable
     steps:
       - checkout
-      - run: apk add --update curl
       - install_awscli
-      # - install_nodejs
-    
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       sudo apt update
-      #       sudo apt upgrade
-      #       sudo apt install curl
-      #       sudo apt install grep
+      - install_nodejs
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt update
+            sudo apt upgrade
+            sudo apt install curl
+            sudo apt install grep
       - run:
           name: Install smoke
           command: |
@@ -374,12 +372,12 @@ jobs:
               
               curl -s $API_URL/api/status | grep "ok"
 
-              if curl -s $API_URL/api/status | grep "ok"
-              then 
-                exist 0
-              else 
-                exist 1
-              fi
+              # if curl -s $API_URL/api/status | grep "ok"
+              # then 
+              #   exist 0
+              # else 
+              #   exist 1
+              # fi
       - run:
           name: Frontend smoke test.
           command: |
