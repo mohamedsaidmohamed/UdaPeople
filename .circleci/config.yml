@@ -350,7 +350,17 @@ jobs:
             sudo apt update
             sudo apt upgrade
             sudo apt install curl
-            
+            sudo apt install grep
+      - run:
+          name: Install smoke
+          command: |
+              export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text )
+              
+              export API_URL="http://${BACKEND_IP}:3030"
+              
+              curl  $API_URL/api/status
       - run:
           name: Backend smoke test.
           command: |
@@ -358,13 +368,14 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text )
 
+              export API_URL="http://${BACKEND_IP}:3030"
+              
               curl  $API_URL/api/status
-
-              echo "API_URL = ${API_URL}"
 
               curl -s $API_URL/api/status | grep "ok"
 
-              export API_URL="http://${BACKEND_IP}:3030"
+              echo "API_URL = ${API_URL}"
+              
               if curl -s $API_URL/api/status | grep "ok"
               then 
                 exist 0
