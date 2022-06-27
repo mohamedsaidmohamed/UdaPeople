@@ -13,9 +13,8 @@ commands:
           when: on_fail
           command: |
            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflowID >>
+           aws s3 rm s3://udapeople-<< parameters.workflowID >> --recursive
            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflowID >>
-
-          #exit 1
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -35,7 +34,6 @@ commands:
                 npm install
                 npn run migration:revert
             fi
-
 
   install_awscli:
     description: Install AWS CLI 
@@ -354,7 +352,7 @@ jobs:
               --output text )
             
               export API_URL="http://${BACKEND_IP}:3030"
-              if curl -s $API_URL/api/status | grep "ok"
+              if curl -s ${API_URL}/api/status | grep "ok"
               then 
                 exist 0
               else 
