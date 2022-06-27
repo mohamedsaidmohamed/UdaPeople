@@ -32,7 +32,7 @@ commands:
             # then
               cd ~/project/backend
               npm install
-              npn run migration:revert
+              npm run migration:revert
             #fi
 
   install_awscli:
