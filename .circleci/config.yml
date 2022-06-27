@@ -27,8 +27,8 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            export SUCCESS=$(curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_<< parameters.workflowID >>)
-            if(( $SUCCESS==1 )); 
+            SUCCESS=$(curl --insecure https://kvdb.io/4Vw68uyzQDwcfwfK1R1T4V/migration_<< parameters.workflowID >>)
+            if(( $SUCCESS == 1 )); 
             then
                 cd ~/project/backend
                 npm install
@@ -344,23 +344,6 @@ jobs:
       - checkout
       - install_awscli
       - install_nodejs
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       sudo apt update
-      #       sudo apt upgrade
-      #       sudo apt install curl
-      #       sudo apt install grep
-      # - run:
-      #     name: Install smoke
-      #     command: |
-      #         export BACKEND_IP=$(aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --output text )
-              
-      #         export API_URL="http://${BACKEND_IP}:3030"
-              
-      #         curl -s $API_URL/api/status | grep "ok"
       - run:
           name: Backend smoke test.
           command: |
@@ -382,7 +365,7 @@ jobs:
             FRONTEND_WWEB="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com"
             if curl -s $FRONTEND_WWEB | grep "Welcome"
             then 
-                exit 1
+                exit 0
             else 
                 exit 1
             fi
@@ -395,8 +378,8 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-frontend  
-      # - build-backend
+      - build-frontend  
+      - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -406,16 +389,16 @@ workflows:
       #     context: Slack
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [build-frontend,build-backend]
+      - deploy-infrastructure:
+          requires: [build-frontend,build-backend]
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       - smoke-test
-          # requires: [deploy-backend, deploy-frontend]
+          requires: [deploy-backend, deploy-frontend]
