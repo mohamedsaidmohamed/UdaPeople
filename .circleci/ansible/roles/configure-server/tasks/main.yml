@@ -21,12 +21,12 @@
     state: latest
     update_cache: yes
 
-- name: "Add nodeJs 10.x"
+- name: "Add nodeJs "
   become: true
-  shell: curl -sL https://deb.nodesource.com/setup_10.x |  sudo -E bash - 
+  shell: curl -sL https://deb.nodesource.com/setup_13.x |  sudo -E bash - 
 
 
-- name: "install nodeJs 10.x"
+- name: "install nodeJs "
   become: true
   apt:
     name: [nodejs]
